@@ -56,7 +56,7 @@ public class ReaderController {
         List<IssueBook> lisba = this.IB.findAll().stream().filter(a -> a.getReaderName().equals(name)).collect(Collectors.toList());
         lisba = lisba.stream().filter(aa -> aa.getBookName().equals(aaa.getBookName())).collect(Collectors.toList());
         int aa = 0;
-        int p = 0;
+        long p = 0;
         for (IssueBook a : lisba) {
             aa = a.getId();
             p = ro.dateCalsi(a.getDateOfIssue());

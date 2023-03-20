@@ -23,13 +23,13 @@ public class ReaderOperation {
     @Autowired
     private IssuedBooks IB;
 
-    public int dateCalsi(LocalDate nowDate1) {
+    public long dateCalsi(LocalDate nowDate1) {
         try {
             LocalDate nowDate = LocalDate.now();
             long s = ChronoUnit.DAYS.between(nowDate1, nowDate);
             if (s > 7) {
-                System.out.println(s);
-                return 50;
+                s = (long) (s * 1.5);
+                return s;
             }
         } catch (Exception a) {
             a.printStackTrace();
