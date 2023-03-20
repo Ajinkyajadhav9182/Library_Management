@@ -42,9 +42,9 @@ public class ReaderController {
                 BR1.save(GSEB);
                 return ResponseEntity.ok(isB);
             }
-            return ResponseEntity.ok("can not issue more than two books ");
+            return ResponseEntity.ok("Can Not Issue More Than Two Books ");
         }
-        return ResponseEntity.ok("this book id not available");
+        return ResponseEntity.ok("This Book Id Not Available");
     }
 
     @PostMapping("/returnBook/{name}")
@@ -63,16 +63,16 @@ public class ReaderController {
         }
         this.IB.deleteById(aa);
         if (lisba.size() == 0) {
-            return ResponseEntity.ok("no data available");
+            return ResponseEntity.ok("No Data Available");
         }
-        return ResponseEntity.ok("your fine is " + p);
+        return ResponseEntity.ok("Your Penalty Is " + p);
     }
 
     @GetMapping("/{name}")
     public ResponseEntity<?> showSingle(@PathVariable("name") String Name) {
         List<IssueBook> lsb = this.IB.findAll().stream().filter(c -> c.getReaderName().equals(Name)).collect(Collectors.toList());
         if (lsb.size() == 0) {
-            return ResponseEntity.ok("no data found for username : " + Name);
+            return ResponseEntity.ok("No Data Found For Username : " + Name);
         }
         return ResponseEntity.ok(lsb);
     }

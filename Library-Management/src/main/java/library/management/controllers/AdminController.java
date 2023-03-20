@@ -27,7 +27,7 @@ public class AdminController {
     public ResponseEntity<List<GetSetBooks>> showAll() {
         List<GetSetBooks> lgsb = this.BR.findAll();
         if (lgsb.size() == 0) {
-            return new ResponseEntity("books not available", HttpStatus.NOT_FOUND);
+            return new ResponseEntity("Books Not Available", HttpStatus.NOT_FOUND);
         }
         return ResponseEntity.ok(lgsb);
     }
@@ -40,7 +40,7 @@ public class AdminController {
             da = BR.findById(id).get();
             return ResponseEntity.ok(da);
         }
-        return new ResponseEntity("book not found", HttpStatus.NOT_FOUND);
+        return new ResponseEntity("Book Not Found", HttpStatus.NOT_FOUND);
     }
 
     @DeleteMapping("/delete/{id}")
@@ -48,15 +48,15 @@ public class AdminController {
         boolean aaa = BR.existsById(id);
         if (aaa) {
             BR.deleteById(id);
-            return "deleted";
+            return "Book Is Deleted";
         }
-        return "value is not present";
+        return "Book Is Not Available";
     }
 
     @DeleteMapping("/deleteAll")
     public String deleteAll() {
         this.BR.deleteAll();
-        return "deleted all";
+        return "All Books Deleted Successfully";
     }
 
     @Autowired
@@ -71,7 +71,7 @@ public class AdminController {
             this.BR.save(aa);
             return ResponseEntity.ok(aa);
         }
-        return ResponseEntity.ok("this id is not present");
+        return ResponseEntity.ok("This Id Is Not Present");
     }
 
     @Autowired
@@ -81,7 +81,7 @@ public class AdminController {
     public ResponseEntity<?> viewIssuedBooks() {
         List<IssueBook> lisb = this.ibs.findAll();
         if (lisb.size() == 0) {
-            return new ResponseEntity("data not available", HttpStatus.NOT_FOUND);
+            return new ResponseEntity("Data Not Available", HttpStatus.NOT_FOUND);
         }
         return ResponseEntity.ok(lisb);
     }
