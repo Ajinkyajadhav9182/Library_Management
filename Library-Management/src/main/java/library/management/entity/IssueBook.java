@@ -15,12 +15,12 @@ public class IssueBook {
     private String readerName;
     private String address;
     private Long contactNo;
-
     private String status;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDate dateOfIssue = LocalDate.now();
 
     private int rating;
+
     public int getId() {
         return id;
     }

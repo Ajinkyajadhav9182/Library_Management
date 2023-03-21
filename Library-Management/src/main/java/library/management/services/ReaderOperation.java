@@ -10,30 +10,31 @@ import java.time.temporal.ChronoUnit;
 
 @Component
 public class ReaderOperation {
-    public GetSetBooks update(GetSetBooks c) {
-        c.setAvailableCopies(c.getAvailableCopies() - 1);
-        return c;
+    public GetSetBooks update(GetSetBooks book) {
+        book.setAvailableCopies(book.getAvailableCopies() - 1);
+        return book;
     }
 
-    public GetSetBooks updateReturn(GetSetBooks c) {
-        c.setAvailableCopies(c.getAvailableCopies() + 1);
-        return c;
+    public GetSetBooks updateReturn(GetSetBooks book) {
+        book.setAvailableCopies(book.getAvailableCopies() + 1);
+        return book;
     }
 
     @Autowired
-    private IssuedBooks IB;
+    private IssuedBooks issuedBooks;
 
-    public long dateCalsi(LocalDate nowDate1) {
+    public long dateCals(LocalDate nowDate1) {
         try {
             LocalDate nowDate = LocalDate.now();
-            long s = ChronoUnit.DAYS.between(nowDate1, nowDate);
-            if (s > 7) {
-                s = (long) (s * 1.5);
-                return s;
+            long countDays = ChronoUnit.DAYS.between(nowDate1, nowDate);
+            if (countDays > 7) {
+                countDays = (long) (countDays * 1.5);
+                return countDays;
             }
-        } catch (Exception a) {
-            a.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
         return 0;
     }
 }
