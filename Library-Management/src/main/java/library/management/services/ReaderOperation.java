@@ -10,13 +10,13 @@ import java.time.temporal.ChronoUnit;
 
 @Component
 public class ReaderOperation {
-    public GetSetBooks update(GetSetBooks book) {
-        book.setAvailableCopies(book.getAvailableCopies() - 1);
+    public GetSetBooks update(GetSetBooks book, int b) {
+        book.setAvailableCopies(book.getAvailableCopies() - b);
         return book;
     }
 
-    public GetSetBooks updateReturn(GetSetBooks book) {
-        book.setAvailableCopies(book.getAvailableCopies() + 1);
+    public GetSetBooks updateReturn(GetSetBooks book,int b) {
+        book.setAvailableCopies(book.getAvailableCopies() + b);
         return book;
     }
 

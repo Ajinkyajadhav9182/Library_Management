@@ -18,8 +18,8 @@ public class IssueBook {
     private String status;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDate dateOfIssue = LocalDate.now();
-
-    private int rating;
+    private int copies;
+    //private int rating;
 
     public int getId() {
         return id;
@@ -37,13 +37,13 @@ public class IssueBook {
         this.bookId = bookId;
     }
 
-    public int getRating() {
-        return rating;
-    }
-
-    public void setRating(int rating) {
-        this.rating = rating;
-    }
+//    public int getRating() {
+//        return rating;
+//    }
+//
+//    public void setRating(int rating) {
+//        this.rating = rating;
+//    }
 
     public String getBookName() {
         return bookName;
@@ -93,6 +93,14 @@ public class IssueBook {
         this.status = status;
     }
 
+    public int getCopies() {
+        return copies;
+    }
+
+    public void setCopies(int copies) {
+        this.copies = copies;
+    }
+
     @Override
     public String toString() {
         return "IssueBook{" +
@@ -104,7 +112,7 @@ public class IssueBook {
                 ", contactNo=" + contactNo +
                 ", status='" + status + '\'' +
                 ", dateOfIssue=" + dateOfIssue +
-                ", rating=" + rating +
+                ", copies=" + copies +
                 '}';
     }
 }
