@@ -23,15 +23,15 @@ public class ReaderController {
     private ReaderOperation rOperation;
 
     @Autowired
-    private GetBooksI gg;
+    private GetBooksI getBooksI;
 
     @GetMapping("/showAllR")
     public ResponseEntity<?> showAllR() {
-        List<GetBooks> kk = this.gg.findAll();
-        if (kk.size() == 0) {
+        List<GetBooks> getBooks = this.getBooksI.findAll();
+        if (getBooks.size() == 0) {
             return new ResponseEntity("Books Not Available", HttpStatus.NOT_FOUND);
         }
-        return ResponseEntity.ok(kk);
+        return ResponseEntity.ok(getBooks);
     }
 
     @Autowired
@@ -40,34 +40,44 @@ public class ReaderController {
     @PostMapping("/issueBook/{id}")
     public ResponseEntity<?> issueBook(@RequestBody IssueBook issue, @PathVariable("id") int id) {
         boolean isThere = bookRepo1.existsById(id);
-        int aa = 0;
+        int getCopies = 0;
         if (isThere) {
             GetSetBooks book1 = bookRepo1.findById(id).get();
-            int t = rOperation.countDigit(issue.getContactNo());
+            int digit = rOperation.countDigit(issue.getContactNo());
             int copies = issue.getCopies();
             if (copies < 3) {
-                if (t == 0) {
-                    int as = rOperation.available(book1, issue);
-                    if (as == 1) {
-                        boolean q = issuedB.existsById(issue.getId());
-                        if (q == false) {
+                if (digit == 0) {
+                    int available = rOperation.available(book1, issue);
+                    if (available == 1) {
+                        boolean existsById = issuedB.existsById(issue.getId());
+                        if (existsById == false) {
                             List<IssueBook> listIssued = this.issuedB.findAll().stream().filter(c -> c.getReaderName().equals(issue.getReaderName())).collect(Collectors.toList());
                             if (listIssued.size() == 1) {
                                 for (IssueBook k : listIssued) {
-                                    aa = k.getCopies();
+                                    getCopies = k.getCopies();
                                 }
                             }
+                            if (listIssued.size() == 0) {
+                                GetSetBooks books1 = bookRepo1.findById(id).get();
+                                issue.setBookName(books1.getBookName());
+                                issue.setBookId(id);
+                                issue.setStatus("Issued");
+                                IssueBook issuedB = this.issuedB.save(issue);
+                                GetSetBooks book11 = rOperation.update(books1, copies);
+                                bookRepo1.save(book11);
+                                return ResponseEntity.ok(issuedB);
+                            }
                             if (listIssued.size() < 2) {
-                                if (aa < 2) {
+                                if (getCopies < 2) {
                                     if (issue.getCopies() <= 1) {
-                                        GetSetBooks db = bookRepo1.findById(id).get();
-                                        issue.setBookName(db.getBookName());
+                                        GetSetBooks setBooks = bookRepo1.findById(id).get();
+                                        issue.setBookName(setBooks.getBookName());
                                         issue.setBookId(id);
                                         issue.setStatus("Issued");
-                                        IssueBook isB = this.issuedB.save(issue);
-                                        GetSetBooks books = rOperation.update(db, copies);
+                                        IssueBook issueBook = this.issuedB.save(issue);
+                                        GetSetBooks books = rOperation.update(setBooks, copies);
                                         bookRepo1.save(books);
-                                        return ResponseEntity.ok(isB);
+                                        return ResponseEntity.ok(issueBook);
                                     }
                                     return ResponseEntity.ok("You Can Issue Only One Book ");
                                 }
@@ -76,11 +86,11 @@ public class ReaderController {
                             return ResponseEntity.ok("Can Not Issue More Than Two Books ");
                         }
                         return ResponseEntity.ok("This Id Is Already Exists ");
-                    } else if (as == 0) {
+                    } else if (available == 0) {
                         return ResponseEntity.ok("No Of Copies Must Be Greater Than 0");
                     }
                     return ResponseEntity.ok("Books Are Not Available");
-                } else if (t == 1) {
+                } else if (digit == 1) {
                     return ResponseEntity.ok("Mobile No Is Greater Than 10");
                 }
                 return ResponseEntity.ok("Mobile No Is Less Than 10");
