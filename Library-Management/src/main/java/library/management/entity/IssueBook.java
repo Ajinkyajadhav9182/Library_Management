@@ -19,7 +19,6 @@ public class IssueBook {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDate dateOfIssue = LocalDate.now();
     private int copies;
-    //private int rating;
 
     public int getId() {
         return id;
@@ -36,14 +35,6 @@ public class IssueBook {
     public void setBookId(int bookId) {
         this.bookId = bookId;
     }
-
-//    public int getRating() {
-//        return rating;
-//    }
-//
-//    public void setRating(int rating) {
-//        this.rating = rating;
-//    }
 
     public String getBookName() {
         return bookName;

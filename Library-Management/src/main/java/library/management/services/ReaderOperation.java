@@ -1,6 +1,7 @@
 package library.management.services;
 
 import library.management.entity.GetSetBooks;
+import library.management.entity.IssueBook;
 import library.management.repo.IssuedBooks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -15,7 +16,7 @@ public class ReaderOperation {
         return book;
     }
 
-    public GetSetBooks updateReturn(GetSetBooks book,int b) {
+    public GetSetBooks updateReturn(GetSetBooks book, int b) {
         book.setAvailableCopies(book.getAvailableCopies() + b);
         return book;
     }
@@ -34,7 +35,30 @@ public class ReaderOperation {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return 0;
+    }
+
+    public int countDigit(long num) {
+        int count = 0;
+        while (num != 0) {
+            num = num / 10;
+            count++;
+        }
+        if (count == 10) {
+            return 0;
+        } else if (count >= 10) {
+            return 1;
+        } else {
+            return 2;
+        }
+    }
+
+    public int available(GetSetBooks a, IssueBook d) {
+        if (d.getCopies() == 0) {
+            return 0;
+        } else if (d.getCopies() <= a.getAvailableCopies()) {
+            return 1;
+        }
+        return 3;
     }
 }
