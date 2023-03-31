@@ -3,8 +3,10 @@ package library.management.controllers;
 import library.management.entity.GetSetBooks;
 import library.management.entity.IssueBook;
 import library.management.repo.BooksRepositiry;
+import library.management.repo.Delete;
 import library.management.repo.IssuedBooks;
 import library.management.services.AdminOperation;
+import library.management.services.SequenceGeneratorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,10 +14,16 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static library.management.entity.GetSetBooks.SEQUENCE_NAME;
+
 @RestController
 public class AdminController {
     @Autowired
     private BooksRepositiry booksRepositiry;
+    @Autowired
+    private Delete delete;
+    @Autowired
+    private SequenceGeneratorService service;
 
     @PostMapping("/addBook")
     public ResponseEntity<?> addBook(@RequestBody GetSetBooks books) {
@@ -23,6 +31,7 @@ public class AdminController {
         if (isThere) {
             return ResponseEntity.ok("This BookId Already Exist");
         }
+        books.setId(service.getSequenceNumber(SEQUENCE_NAME));
         GetSetBooks saved = this.booksRepositiry.save(books);
         return ResponseEntity.ok(saved);
     }
@@ -60,6 +69,7 @@ public class AdminController {
     @DeleteMapping("/deleteAll")
     public String deleteAll() {
         this.booksRepositiry.deleteAll();
+        this.delete.deleteAll();
         return "All Books Deleted Successfully";
     }
 

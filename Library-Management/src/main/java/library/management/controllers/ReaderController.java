@@ -7,6 +7,7 @@ import library.management.repo.BooksRepositiry;
 import library.management.repo.GetBooksI;
 import library.management.repo.IssuedBooks;
 import library.management.services.ReaderOperation;
+import library.management.services.SequenceGeneratorService1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static library.management.entity.IssueBook.SEQUENCE_NAME;
 
 @RestController
 public class ReaderController {
@@ -36,6 +39,9 @@ public class ReaderController {
 
     @Autowired
     private IssuedBooks issuedB;
+    @Autowired
+    private SequenceGeneratorService1 service;
+
 
     @PostMapping("/issueBook/{id}")
     public ResponseEntity<?> issueBook(@RequestBody IssueBook issue, @PathVariable("id") int id) {
@@ -62,28 +68,27 @@ public class ReaderController {
                                 issue.setBookName(books1.getBookName());
                                 issue.setBookId(id);
                                 issue.setStatus("Issued");
+                                issue.setId(service.getSequenceNumber(SEQUENCE_NAME));
                                 IssueBook issuedB = this.issuedB.save(issue);
                                 GetSetBooks book11 = rOperation.update(books1, copies);
                                 bookRepo1.save(book11);
                                 return ResponseEntity.ok(issuedB);
                             }
-                            if (listIssued.size() < 2) {
-                                if (getCopies < 2) {
-                                    if (issue.getCopies() <= 1) {
-                                        GetSetBooks setBooks = bookRepo1.findById(id).get();
-                                        issue.setBookName(setBooks.getBookName());
-                                        issue.setBookId(id);
-                                        issue.setStatus("Issued");
-                                        IssueBook issueBook = this.issuedB.save(issue);
-                                        GetSetBooks books = rOperation.update(setBooks, copies);
-                                        bookRepo1.save(books);
-                                        return ResponseEntity.ok(issueBook);
-                                    }
-                                    return ResponseEntity.ok("You Can Issue Only One Book ");
+                            if (getCopies < 2 && listIssued.size() < 2) {
+                                if (issue.getCopies() <= 1) {
+                                    GetSetBooks setBooks = bookRepo1.findById(id).get();
+                                    issue.setBookName(setBooks.getBookName());
+                                    issue.setBookId(id);
+                                    issue.setStatus("Issued");
+                                    issue.setId(service.getSequenceNumber(SEQUENCE_NAME));
+                                    IssueBook issueBook = this.issuedB.save(issue);
+                                    GetSetBooks books = rOperation.update(setBooks, copies);
+                                    bookRepo1.save(books);
+                                    return ResponseEntity.ok(issueBook);
                                 }
-                                return ResponseEntity.ok("You Have Already Issued Two Books ");
+                                return ResponseEntity.ok("You Have Already Issued 1 Book Now You Can Issue Only 1 Book ");
                             }
-                            return ResponseEntity.ok("Can Not Issue More Than Two Books ");
+                            return ResponseEntity.ok("You Have Already Issued Two Books ");
                         }
                         return ResponseEntity.ok("This Id Is Already Exists ");
                     } else if (available == 0) {
@@ -103,7 +108,7 @@ public class ReaderController {
     @PostMapping("/returnBook/{name}")
     public ResponseEntity<?> returnBook(@RequestBody GetSetBooks books, @PathVariable("name") String name) {
         int ab = books.getRating();
-        if (ab < 6) {
+        if (ab < 6 && ab > 0) {
             GetSetBooks book1 = this.bookRepo1.findById(books.getId()).get();
             List<IssueBook> listIssued = this.issuedB.findAll().stream().filter(a -> a.getReaderName().equals(name)).collect(Collectors.toList());
             listIssued = listIssued.stream().filter(aa -> aa.getBookName().equals(book1.getBookName())).collect(Collectors.toList());
@@ -120,11 +125,11 @@ public class ReaderController {
             this.bookRepo1.save(book2);
             this.issuedB.deleteById(findIdToDeleteIssued);
             if (listIssued.size() == 0) {
-                return ResponseEntity.ok("No Data Available");
+                return ResponseEntity.ok("Data Not Available");
             }
             return ResponseEntity.ok(" Successfully Completed... \n Your Penalty Is $ :" + penelty);
         }
-        return ResponseEntity.ok("Rating Should Be Must Less Or Equals 5 ");
+        return ResponseEntity.ok("Enter A Valid Rating > 0 and <= 5 ");
     }
 
     @GetMapping("/name/{name}")
