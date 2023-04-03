@@ -14,11 +14,8 @@ import static org.springframework.data.mongodb.core.FindAndModifyOptions.options
 
 @Service
 public class SequenceGeneratorService {
-
-
     @Autowired
     private MongoOperations mongoOperations;
-
 
     public int getSequenceNumber(String sequenceName) {
         //get sequence no
@@ -30,7 +27,6 @@ public class SequenceGeneratorService {
                 .findAndModify(query,
                         update, options().returnNew(true).upsert(true),
                         DbSequence.class);
-
         return !Objects.isNull(counter) ? counter.getSeq() : 1;
     }
 }

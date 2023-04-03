@@ -4,6 +4,7 @@ import library.management.entity.GetSetBooks;
 import library.management.entity.IssueBook;
 import library.management.repo.BooksRepositiry;
 import library.management.repo.Delete;
+import library.management.repo.Delete1;
 import library.management.repo.IssuedBooks;
 import library.management.services.AdminOperation;
 import library.management.services.SequenceGeneratorService;
@@ -24,6 +25,12 @@ public class AdminController {
     private Delete delete;
     @Autowired
     private SequenceGeneratorService service;
+    @Autowired
+    private IssuedBooks issuedBooks;
+    @Autowired
+    private Delete1 delete1;
+    @Autowired
+    AdminOperation adOperation;
 
     @PostMapping("/addBook")
     public ResponseEntity<?> addBook(@RequestBody GetSetBooks books) {
@@ -73,9 +80,6 @@ public class AdminController {
         return "All Books Deleted Successfully";
     }
 
-    @Autowired
-    AdminOperation adOperation;
-
     @PutMapping("/update/{id}")
     public ResponseEntity<?> update(@RequestBody GetSetBooks books, @PathVariable("id") int id) {
         boolean isThere = booksRepositiry.existsById(id);
@@ -88,13 +92,11 @@ public class AdminController {
         return ResponseEntity.ok("This Id Is Not Present");
     }
 
-    @Autowired
-    private IssuedBooks ibs;
-
     @GetMapping("/viewIssued")
     public ResponseEntity<?> viewIssuedBooks() {
-        List<IssueBook> listIssued = this.ibs.findAll();
+        List<IssueBook> listIssued = this.issuedBooks.findAll();
         if (listIssued.size() == 0) {
+            this.delete1.deleteAll();
             return new ResponseEntity("Data Not Available", HttpStatus.NOT_FOUND);
         }
         return ResponseEntity.ok(listIssued);

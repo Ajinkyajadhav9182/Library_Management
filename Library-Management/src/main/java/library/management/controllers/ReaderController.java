@@ -27,6 +27,10 @@ public class ReaderController {
 
     @Autowired
     private GetBooksI getBooksI;
+    @Autowired
+    private IssuedBooks issuedB;
+    @Autowired
+    private SequenceGeneratorService1 service;
 
     @GetMapping("/showAllR")
     public ResponseEntity<?> showAllR() {
@@ -37,11 +41,14 @@ public class ReaderController {
         return ResponseEntity.ok(getBooks);
     }
 
-    @Autowired
-    private IssuedBooks issuedB;
-    @Autowired
-    private SequenceGeneratorService1 service;
-
+    @GetMapping("/name/{name}")
+    public ResponseEntity<?> showSingle(@PathVariable("name") String Name) {
+        List<IssueBook> listIssued = this.issuedB.findAll().stream().filter(c -> c.getReaderName().equals(Name)).collect(Collectors.toList());
+        if (listIssued.size() == 0) {
+            return ResponseEntity.ok("No Data Found For Username : " + Name);
+        }
+        return ResponseEntity.ok(listIssued);
+    }
 
     @PostMapping("/issueBook/{id}")
     public ResponseEntity<?> issueBook(@RequestBody IssueBook issue, @PathVariable("id") int id) {
@@ -107,18 +114,18 @@ public class ReaderController {
 
     @PostMapping("/returnBook/{name}")
     public ResponseEntity<?> returnBook(@RequestBody GetSetBooks books, @PathVariable("name") String name) {
-        int ab = books.getRating();
-        if (ab < 6 && ab > 0) {
+        int rating = books.getRating();
+        if (rating < 6 && rating > 0) {
             GetSetBooks book1 = this.bookRepo1.findById(books.getId()).get();
             List<IssueBook> listIssued = this.issuedB.findAll().stream().filter(a -> a.getReaderName().equals(name)).collect(Collectors.toList());
-            listIssued = listIssued.stream().filter(aa -> aa.getBookName().equals(book1.getBookName())).collect(Collectors.toList());
+            listIssued = listIssued.stream().filter(i -> i.getBookName().equals(book1.getBookName())).collect(Collectors.toList());
             int findIdToDeleteIssued = 0;
             long penelty = 0;
             int copies = 0;
-            for (IssueBook a : listIssued) {
-                findIdToDeleteIssued = a.getId();
-                copies = a.getCopies();
-                penelty = rOperation.dateCals(a.getDateOfIssue());
+            for (IssueBook issueBook : listIssued) {
+                findIdToDeleteIssued = issueBook.getId();
+                copies = issueBook.getCopies();
+                penelty = rOperation.dateCals(issueBook.getDateOfIssue());
             }
             GetSetBooks book2 = rOperation.updateReturn(book1, copies);
             book2.setRating(books.getRating());
@@ -130,14 +137,5 @@ public class ReaderController {
             return ResponseEntity.ok(" Successfully Completed... \n Your Penalty Is $ :" + penelty);
         }
         return ResponseEntity.ok("Enter A Valid Rating > 0 and <= 5 ");
-    }
-
-    @GetMapping("/name/{name}")
-    public ResponseEntity<?> showSingle(@PathVariable("name") String Name) {
-        List<IssueBook> listIssued = this.issuedB.findAll().stream().filter(c -> c.getReaderName().equals(Name)).collect(Collectors.toList());
-        if (listIssued.size() == 0) {
-            return ResponseEntity.ok("No Data Found For Username : " + Name);
-        }
-        return ResponseEntity.ok(listIssued);
     }
 }
