@@ -1,0 +1,6 @@
+spring:
+  data:
+    mongodb:
+      database: library
+      host: librarydata
+      port: 27017

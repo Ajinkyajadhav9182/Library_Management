@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 import static library.management.entity.GetSetBooks.SEQUENCE_NAME;
@@ -33,7 +34,7 @@ public class AdminController {
     AdminOperation adOperation;
 
     @PostMapping("/addBook")
-    public ResponseEntity<?> addBook(@RequestBody GetSetBooks books) {
+    public ResponseEntity<?> addBook(@Valid @RequestBody GetSetBooks books) {
         boolean isThere = this.booksRepositiry.existsById(books.getId());
         if (isThere) {
             return ResponseEntity.ok("This BookId Already Exist");
@@ -81,7 +82,7 @@ public class AdminController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> update(@RequestBody GetSetBooks books, @PathVariable("id") int id) {
+    public ResponseEntity<?> update(@Valid @RequestBody GetSetBooks books, @PathVariable("id") int id) {
         boolean isThere = booksRepositiry.existsById(id);
         if (isThere) {
             GetSetBooks book1 = this.booksRepositiry.findById(id).get();

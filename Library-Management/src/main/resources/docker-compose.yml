@@ -1,0 +1,14 @@
+version: "3"
+services:
+  librarydata:
+    image: mongo:latest
+    container_name: librarydata
+    ports:
+      - 27017:27017
+  changed:
+    image: changed:latest
+    container_name: changed
+    ports:
+      - 8080:8080
+    links:
+      - librarydata

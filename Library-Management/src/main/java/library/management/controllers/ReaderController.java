@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,63 +52,44 @@ public class ReaderController {
     }
 
     @PostMapping("/issueBook/{id}")
-    public ResponseEntity<?> issueBook(@RequestBody IssueBook issue, @PathVariable("id") int id) {
-        boolean isThere = bookRepo1.existsById(id);
+    public ResponseEntity<?> issueBook(@Valid @RequestBody IssueBook issue, @PathVariable("id") int id) {
         int getCopies = 0;
+        boolean isThere = bookRepo1.existsById(id);
         if (isThere) {
             GetSetBooks book1 = bookRepo1.findById(id).get();
-            int digit = rOperation.countDigit(issue.getContactNo());
             int copies = issue.getCopies();
-            if (copies < 3) {
-                if (digit == 0) {
-                    int available = rOperation.available(book1, issue);
-                    if (available == 1) {
-                        boolean existsById = issuedB.existsById(issue.getId());
-                        if (existsById == false) {
-                            List<IssueBook> listIssued = this.issuedB.findAll().stream().filter(c -> c.getReaderName().equals(issue.getReaderName())).collect(Collectors.toList());
-                            if (listIssued.size() == 1) {
-                                for (IssueBook k : listIssued) {
-                                    getCopies = k.getCopies();
-                                }
-                            }
-                            if (listIssued.size() == 0) {
-                                GetSetBooks books1 = bookRepo1.findById(id).get();
-                                issue.setBookName(books1.getBookName());
-                                issue.setBookId(id);
-                                issue.setStatus("Issued");
-                                issue.setId(service.getSequenceNumber(SEQUENCE_NAME));
-                                IssueBook issuedB = this.issuedB.save(issue);
-                                GetSetBooks book11 = rOperation.update(books1, copies);
-                                bookRepo1.save(book11);
-                                return ResponseEntity.ok(issuedB);
-                            }
-                            if (getCopies < 2 && listIssued.size() < 2) {
-                                if (issue.getCopies() <= 1) {
-                                    GetSetBooks setBooks = bookRepo1.findById(id).get();
-                                    issue.setBookName(setBooks.getBookName());
-                                    issue.setBookId(id);
-                                    issue.setStatus("Issued");
-                                    issue.setId(service.getSequenceNumber(SEQUENCE_NAME));
-                                    IssueBook issueBook = this.issuedB.save(issue);
-                                    GetSetBooks books = rOperation.update(setBooks, copies);
-                                    bookRepo1.save(books);
-                                    return ResponseEntity.ok(issueBook);
-                                }
-                                return ResponseEntity.ok("You Have Already Issued 1 Book Now You Can Issue Only 1 Book ");
-                            }
-                            return ResponseEntity.ok("You Have Already Issued Two Books ");
+                boolean available = rOperation.available(book1, issue);
+                if (available) {
+                    List<IssueBook> listIssued = this.issuedB.findAll().stream().filter(c -> c.getReaderName().equals(issue.getReaderName())).collect(Collectors.toList());
+                    if (listIssued.size() == 1) {
+                        for (IssueBook k : listIssued) {
+                            getCopies = k.getCopies();
                         }
-                        return ResponseEntity.ok("This Id Is Already Exists ");
-                    } else if (available == 0) {
-                        return ResponseEntity.ok("No Of Copies Must Be Greater Than 0");
                     }
-                    return ResponseEntity.ok("Books Are Not Available");
-                } else if (digit == 1) {
-                    return ResponseEntity.ok("Mobile No Is Greater Than 10");
+                    if (listIssued.size() == 0) {
+                        issue.setBookName(book1.getBookName());
+                        issue.setBookId(id);
+                        issue.setId(service.getSequenceNumber(SEQUENCE_NAME));
+                        IssueBook issuedB = this.issuedB.save(issue);
+                        GetSetBooks book11 = rOperation.update(book1, copies);
+                        bookRepo1.save(book11);
+                        return ResponseEntity.ok(issuedB);
+                    }
+                    if (getCopies < 2 && listIssued.size() < 2) {
+                        if (issue.getCopies() <= 1) {
+                            issue.setBookName(book1.getBookName());
+                            issue.setBookId(id);
+                            issue.setId(service.getSequenceNumber(SEQUENCE_NAME));
+                            IssueBook issueBook = this.issuedB.save(issue);
+                            GetSetBooks books = rOperation.update(book1, copies);
+                            bookRepo1.save(books);
+                            return ResponseEntity.ok(issueBook);
+                        }
+                        return ResponseEntity.ok("You Have Already Issued 1 Book Now You Can Issue Only 1 Book ");
+                    }
+                    return ResponseEntity.ok("You Have Already Issued Two Books ");
                 }
-                return ResponseEntity.ok("Mobile No Is Less Than 10");
-            }
-            return ResponseEntity.ok("No Of Copies Must Be Less Or Equals 2");
+                return ResponseEntity.ok("No Of Copies Must Be Greater Than 0 And Less Or Equals 2");
         }
         return ResponseEntity.ok("This Book Id Not Available");
     }

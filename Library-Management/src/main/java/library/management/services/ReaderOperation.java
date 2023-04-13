@@ -38,27 +38,12 @@ public class ReaderOperation {
         return 0;
     }
 
-    public int countDigit(long num) {
-        int count = 0;
-        while (num != 0) {
-            num = num / 10;
-            count++;
-        }
-        if (count == 10) {
-            return 0;
-        } else if (count >= 10) {
-            return 1;
-        } else {
-            return 2;
-        }
-    }
-
-    public int available(GetSetBooks getSetBooks, IssueBook issueBook) {
-        if (issueBook.getCopies() == 0) {
-            return 0;
+    public boolean available(GetSetBooks getSetBooks, IssueBook issueBook) {
+        if (issueBook.getCopies() == 0 && issueBook.getCopies() < 3) {
+            return false;
         } else if (issueBook.getCopies() <= getSetBooks.getAvailableCopies()) {
-            return 1;
+            return true;
         }
-        return 3;
+        return false;
     }
 }
