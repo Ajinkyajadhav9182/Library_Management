@@ -58,38 +58,38 @@ public class ReaderController {
         if (isThere) {
             GetSetBooks book1 = bookRepo1.findById(id).get();
             int copies = issue.getCopies();
-                boolean available = rOperation.available(book1, issue);
-                if (available) {
-                    List<IssueBook> listIssued = this.issuedB.findAll().stream().filter(c -> c.getReaderName().equals(issue.getReaderName())).collect(Collectors.toList());
-                    if (listIssued.size() == 1) {
-                        for (IssueBook k : listIssued) {
-                            getCopies = k.getCopies();
-                        }
+            boolean available = rOperation.available(book1, issue);
+            if (available) {
+                List<IssueBook> listIssued = this.issuedB.findAll().stream().filter(c -> c.getReaderName().equals(issue.getReaderName())).collect(Collectors.toList());
+                if (listIssued.size() == 1) {
+                    for (IssueBook k : listIssued) {
+                        getCopies = k.getCopies();
                     }
-                    if (listIssued.size() == 0) {
+                }
+                if (listIssued.size() == 0) {
+                    issue.setBookName(book1.getBookName());
+                    issue.setBookId(id);
+                    issue.setId(service.getSequenceNumber(SEQUENCE_NAME));
+                    IssueBook issuedB = this.issuedB.save(issue);
+                    GetSetBooks book11 = rOperation.update(book1, copies);
+                    bookRepo1.save(book11);
+                    return ResponseEntity.ok(issuedB);
+                }
+                if (getCopies < 2 && listIssued.size() < 2) {
+                    if (issue.getCopies() <= 1) {
                         issue.setBookName(book1.getBookName());
                         issue.setBookId(id);
                         issue.setId(service.getSequenceNumber(SEQUENCE_NAME));
-                        IssueBook issuedB = this.issuedB.save(issue);
-                        GetSetBooks book11 = rOperation.update(book1, copies);
-                        bookRepo1.save(book11);
-                        return ResponseEntity.ok(issuedB);
+                        IssueBook issueBook = this.issuedB.save(issue);
+                        GetSetBooks books = rOperation.update(book1, copies);
+                        bookRepo1.save(books);
+                        return ResponseEntity.ok(issueBook);
                     }
-                    if (getCopies < 2 && listIssued.size() < 2) {
-                        if (issue.getCopies() <= 1) {
-                            issue.setBookName(book1.getBookName());
-                            issue.setBookId(id);
-                            issue.setId(service.getSequenceNumber(SEQUENCE_NAME));
-                            IssueBook issueBook = this.issuedB.save(issue);
-                            GetSetBooks books = rOperation.update(book1, copies);
-                            bookRepo1.save(books);
-                            return ResponseEntity.ok(issueBook);
-                        }
-                        return ResponseEntity.ok("You Have Already Issued 1 Book Now You Can Issue Only 1 Book ");
-                    }
-                    return ResponseEntity.ok("You Have Already Issued Two Books ");
+                    return ResponseEntity.ok("You Have Already Issued 1 Book Now You Can Issue Only 1 Book ");
                 }
-                return ResponseEntity.ok("No Of Copies Must Be Greater Than 0 And Less Or Equals 2");
+                return ResponseEntity.ok("You Have Already Issued Two Books ");
+            }
+            return ResponseEntity.ok("No Of Copies Must Be Greater Than 0 And Less Or Equals 2");
         }
         return ResponseEntity.ok("This Book Id Not Available");
     }

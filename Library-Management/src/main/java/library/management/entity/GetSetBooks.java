@@ -15,16 +15,23 @@ import javax.validation.constraints.NotNull;
 public class GetSetBooks {
     @Transient
     public static final String SEQUENCE_NAME = "user_sequence";
+
     private int id;
+
     @NotNull(message = "Book Name Should Not Be Null")
     private String bookName;
+
     @NotNull(message = "Author Name Should Not Be Null")
     private String authorName;
+
     @NotNull(message = "Publication Should Not Be Null")
     private String publication;
+
     @Min(value = 1, message = "Price Should Be Greater Than 0")
     private float price;
+
     @Min(value = 1, message = "Available Copies Should Be Greater Than 0")
     private int availableCopies;
+
     private int rating;
 }
